@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta th:replace="~{fragments/head}">
+    <title>Mutu - Matches</title>
+    <style>
+        .avatar {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div th:replace="~{fragments/navbar}"></div>
+
+    <div class="mt-3">
+        <span><strong>Matches</strong></span>
+    </div>
+
+    <div class="d-flex gap-3 flex-column mt-3">
+        <div th:each="match : ${matches}" class="border rounded p-2">
+            <a th:href="@{/chat/{match}(match=${match.id})}">
+                <div class="d-flex gap-3 align-items-center">
+                    <div>
+                        <img
+                            class="avatar rounded-circle"
+                            th:src="'data:image/jpeg;base64,' + ${avatars.get(match.id).getImageDataString()}"
+                            th:alt="${match.name}"
+                            th:title="${match.name}"
+                        />
+                    </div>
+                    <div><span th:text="${match.name}"></span></div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

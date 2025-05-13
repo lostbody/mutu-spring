@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Error</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
+        .error-card {
+            border: 1px solid #ffcccc;
+            background-color: #fff8f8;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 50px auto;
+            max-width: 500px;
+        }
+        .error-title { color: #cc0000; }
+        .back-link { margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="error-card">
+    <h1 class="error-title">Error</h1>
+    <p th:text="${errorMessage ?: 'An unexpected error occurred.'}">Error message</p>
+    <div class="back-link">
+        <a href="/swipe">Return to swipe page</a> | <a href="/login">Back to login</a>
+    </div>
+</div>
+</body>
+</html>

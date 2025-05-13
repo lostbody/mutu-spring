@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta th:replace="~{fragments/head}">
+    <title>Mutu - Chat</title>
+    <style>
+        .avatar {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div th:replace="~{fragments/navbar}"></div>
+
+    <div class="card mt-3 shadow-sm">
+        <div class="card-body d-flex align-items-center gap-3">
+            <img
+                    class="avatar rounded-circle"
+                    th:src="'data:image/jpeg;base64,' + ${avatar}"
+                    th:alt="${match.name}"
+                    th:title="${match.name}"
+            />
+
+            <div class="card-title"><span th:text="${match.name}"></span></div>
+        </div>
+
+        <div id="conversation" class="d-flex w-100 flex-column align-items-start p-3 pt-0">
+            <div th:each="message : ${messages}"
+                 class="message rounded-pill px-3 py-2 text-white my-1"
+                 th:classappend="${match.id == message.receiver.id} ? 'bg-primary align-self-end' : 'bg-secondary'">
+                <span th:text="${message.content}"></span>
+            </div>
+        </div>
+
+        <div class="d-flex p-2 align-self-end">
+            <input class="div-control" type="text" id="messageTyped"/>
+            <button class="btn" type="button" id="sendButton">Send</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
