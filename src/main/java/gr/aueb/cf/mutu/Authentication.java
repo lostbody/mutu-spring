@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class Authentication {
     private final UserRepository userRepository;
     private static final SecureRandom rand = new SecureRandom();
-    private static final HashMap<String, User> sessions = new HashMap<>();
+    private static final HashMap<String, Long> sessions = new HashMap<>();
 
     public Authentication(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -43,7 +43,13 @@ public class Authentication {
                 if (!cookie.getName().equals("loginToken")) { continue; }
                 String token = cookie.getValue();
 
-                loggedUser = sessions.get(token);
+                Long userId = sessions.get(token);
+                if (userId != null) {
+                    loggedUser = userRepository
+                            .findById(userId)
+                            .orElse(null);
+                }
+
                 break;
             }
         }
@@ -57,7 +63,7 @@ public class Authentication {
             token = String.format("%06d", rand.nextInt(1_000_000));
         } while (sessions.containsKey(token));
 
-        sessions.put(token, user);
+        sessions.put(token, user.getId());
 
         Cookie cookie = new Cookie("loginToken", token);
         cookie.setHttpOnly(true);

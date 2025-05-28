@@ -129,21 +129,20 @@
 
 
     const updateUser = () => {
-        const params = {
+        const payload = {
             weight: weight$.value,
             bio: bio$.value,
-            interests: interests
+            interestsIds: interests
                 .filter((interest$) => interest$.classList.contains("selected"))
                 .map((interest$) => interest$.dataset.id)
         }
-        const formBody = new URLSearchParams(params).toString()
 
-        fetch("account-settings", {
+        fetch("/settings", {
             method: "POST",
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/json'
             },
-            body: formBody,
+            body: JSON.stringify(payload),
         })
             .then(response => {
                 if (response.ok) {
@@ -167,28 +166,22 @@
         })
     }
 
-
     const deletePicture = (picture) => {
         picture.element$.remove()
 
-        const params = {
-            id: picture.id,
-        }
-        const query = new URLSearchParams(params).toString()
-
-        fetch("pictures?" + query, {
+        fetch("pictures/" + picture.id, {
             method: "DELETE",
         })
     }
 
     const movePicture = (picture, direction) => {
         const pictureIndex = pictures.indexOf(picture)
-        const otherIndex = direction === "left" ? pictureIndex - 1 : pictureIndex + 1
+        const otherIndex = direction === "LEFT" ? pictureIndex - 1 : pictureIndex + 1
         if (otherIndex === -1 || otherIndex === pictures.length) {
             return
         }
 
-        if (direction === "left") {
+        if (direction === "LEFT") {
             pictures$.insertBefore(pictures[pictureIndex].element$, pictures[otherIndex].element$)
         } else {
             pictures$.insertBefore(pictures[otherIndex].element$, pictures[pictureIndex].element$)
@@ -198,14 +191,8 @@
         pictures[pictureIndex] = pictures[otherIndex]
         pictures[otherIndex] = temp
 
-        const params = {
-            id: picture.id,
-            direction: direction,
-        }
-        const query = new URLSearchParams(params).toString()
-
-        fetch("pictures?" + query, {
-            method: "PUT",
+        fetch("pictures/" + picture.id + "/move/" + direction, {
+            method: "POST",
         })
     }
 
@@ -236,13 +223,13 @@
         const buttonLeft$ = document.createElement("div")
         buttonLeft$.classList.add("btn", "btn-outline-secondary")
         buttonLeft$.innerHTML = '<i class="fa-solid fa-chevron-left"></i>'
-        buttonLeft$.addEventListener("click", () => movePicture(picture, "left"))
+        buttonLeft$.addEventListener("click", () => movePicture(picture, "LEFT"))
         controls$.appendChild(buttonLeft$)
 
         const buttonRight$ = document.createElement("div")
         buttonRight$.classList.add("btn", "btn-outline-secondary")
         buttonRight$.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
-        buttonRight$.addEventListener("click", () => movePicture(picture, "right"))
+        buttonRight$.addEventListener("click", () => movePicture(picture, "RIGHT"))
         controls$.appendChild(buttonRight$)
 
         return container$
@@ -261,18 +248,17 @@
         reader.onload = () => {
             const imageData = reader.result.slice("data:image/jpeg;base64,".length)
 
-            const params = {
+            const payload = {
                 filename: filename,
                 imageData: imageData,
             }
-            const formBody = new URLSearchParams(params).toString()
 
             fetch("pictures", {
                 method: "POST",
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/JSON'
                 },
-                body: formBody,
+                body: JSON.stringify(payload),
             })
                 .then((result) => result.json())
                 .then((createdPicture) => {

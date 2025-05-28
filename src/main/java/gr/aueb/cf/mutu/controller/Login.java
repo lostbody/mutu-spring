@@ -30,7 +30,7 @@ public class Login {
         User user = authentication.authenticateUser(email, password);
         if (user != null) {
             authentication.createUserSession(user, response);
-            return "redirect:/swipe"; // Use real service with fallbacks
+            return "redirect:/swipe";
         } else {
             System.out.println("Login failed. Redirecting to login with error.");
             model.addAttribute("error", true);

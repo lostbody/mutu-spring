@@ -1,5 +1,5 @@
 <%@ page import="gr.aueb.cf.mutu.Authentication" %>
-<%@ page import="gr.aueb.cf.mutu.dto.UserDto" %>
+<%@ page import="gr.aueb.cf.mutu.controller.dto.UserDto" %>
 <%  //ψάχνει να βρει αν υπάρχει user στο hashmap sessions. Δηλαδή αν έχει ξαναμπει αυτός ο user και εχει token
 
     UserDto user = Authentication.getSessionUser(request);

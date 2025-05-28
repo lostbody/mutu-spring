@@ -1,6 +1,7 @@
 package gr.aueb.cf.mutu.controller;
 
 import gr.aueb.cf.mutu.Authentication;
+import gr.aueb.cf.mutu.controller.dto.UpdateUserRequestDto;
 import gr.aueb.cf.mutu.model.Interest;
 import gr.aueb.cf.mutu.model.Picture;
 import gr.aueb.cf.mutu.model.User;
@@ -9,14 +10,13 @@ import gr.aueb.cf.mutu.repository.PictureRepository;
 import gr.aueb.cf.mutu.repository.UserActionRepository;
 import gr.aueb.cf.mutu.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -43,7 +43,7 @@ public class Settings {
     }
 
     @GetMapping("/settings")
-    public String settingsGet(
+    public String getUser(
             HttpServletRequest request,
             Model model
     ) {
@@ -77,5 +77,28 @@ public class Settings {
         model.addAttribute("matches", matches);
 
         return "settings";
+    }
+
+    @PostMapping("/settings")
+    public void updateUser(
+            HttpServletRequest request,
+            @RequestBody UpdateUserRequestDto updateUserRequestDto
+    ) {
+        User loggedUser = authentication.getSessionUser(request);
+        if (loggedUser == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
+        loggedUser.setWeight(updateUserRequestDto.getWeight());
+
+        loggedUser.setBio(updateUserRequestDto.getBio());
+
+        Set<Interest> userInterests = new HashSet<>();
+        for (Long interestId : updateUserRequestDto.getInterestsIds()) {
+            interestRepository.findById(interestId).ifPresent(userInterests::add);
+        }
+        loggedUser.setInterests(userInterests);
+
+        userRepository.save(loggedUser);
     }
 }

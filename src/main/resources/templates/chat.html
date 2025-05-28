@@ -43,4 +43,63 @@
 </div>
 
 </body>
+
+<script th:inline="javascript">
+
+    const matchId = [[${match.id}]];
+
+    const messageTyped$ = document.getElementById("messageTyped")
+    const sendButton$ = document.getElementById("sendButton")
+    const conversation$ = document.getElementById("conversation")
+
+    const handleSendMessage = () => {
+        const payload = {
+            messageTyped: messageTyped$.value
+        }
+
+        fetch("/chat/" + matchId + "/send", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload),
+        })
+
+        messageTyped$.value = ""
+    }
+
+    sendButton$.addEventListener("click", handleSendMessage)
+
+    let latestTimestamp = Date.now();
+
+    const getNewMessages = () => {
+        fetch("/chat/" + matchId + "/update/" + latestTimestamp)
+            .then((response) => response.json())
+            .then((response) => {
+                const messages = response.messages
+
+                for (const serverMessage of messages) {
+
+                    console.log({ matchId, 'serverMessage.sender': serverMessage.sender })
+
+                    const messageDiv$ = document.createElement("div")
+                    const side = serverMessage.senderId === matchId ? "bg-secondary" : "bg-primary align-self-end"
+                    messageDiv$.className = "message rounded-pill px-3 py-2 text-white my-1 " + side
+                    conversation$.append(messageDiv$)
+
+                    const messageSpan$ = document.createElement("span")
+                    messageSpan$.textContent = serverMessage.content
+                    messageDiv$.append(messageSpan$)
+                }
+
+                if (messages.length > 0) {
+                    latestTimestamp = messages[messages.length - 1].timestamp
+                }
+            })
+    }
+
+    setInterval(getNewMessages, 1000);
+
+</script>
+
 </html>
